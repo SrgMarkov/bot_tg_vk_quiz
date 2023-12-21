@@ -1,24 +1,32 @@
 import os
-from pprint import pprint
+
+from dotenv import load_dotenv
 
 
 def format_text(text: str) -> str:
-    return text.replace('\n', '').split(':')[1]
+    return text.replace('\n', ' ').split(':')[1]
 
 
-questions_for_quiz = []
-questions_files = [os.path.join('quiz-questions', file) for file in os.listdir('quiz-questions')]
-for questions_file in questions_files:
-    with open(questions_file, encoding="KOI8-R") as text_file:
-        encoded_text_file = text_file.read()
-        qlist = encoded_text_file.split('\n\n')
-        for item in qlist:
-            if 'Вопрос' in item:
-                item_index = qlist.index(item)
-                try:
-                    questions_for_quiz.append({'question': format_text(item),
-                                               'answer': format_text(qlist[item_index + 1])})
-                except IndexError:
-                    pass
+def get_questions():
+    load_dotenv()
+    questions_folder = os.getenv('QUESTIONS_FOLDER')
+    questions_files = [os.path.join(questions_folder, file) for file in os.listdir(questions_folder)]
+    questions_for_bot = []
 
-pprint(questions_for_quiz)
+    for questions_file in questions_files:
+        with open(questions_file, 'r', encoding="KOI8-R") as text_file:
+            encoded_text_file = text_file.read()
+            questions = encoded_text_file.split('\n\n')
+            for question in questions:
+                if ('Вопрос' in question) \
+                        and ('aud' not in question) \
+                        and ('pic' not in question) \
+                        and ('Ведущему' not in question):
+                    item_index = questions.index(question)
+                    try:
+                        questions_for_bot.append({'question': format_text(question),
+                                                  'answer': format_text(questions[item_index + 1])})
+                    except IndexError:
+                        pass
+    print(len(questions_for_bot))
+    return questions_for_bot

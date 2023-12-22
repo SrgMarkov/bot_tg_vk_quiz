@@ -4,9 +4,11 @@ Telegram и ВК бот для проведения интеллектуальн
 
 ### Пример работы
 Пример работы в ТГ
+
 ![examination_tg](https://github.com/SrgMarkov/BOT_quiz/assets/107784915/8dd17d2d-310a-4075-9616-3c397554206c)
 
 Пример работы в ВК
+
 ![examination_vk](https://github.com/SrgMarkov/BOT_quiz/assets/107784915/a3ed82b3-676c-4313-9a50-4f1925359372)
 
 

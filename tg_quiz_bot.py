@@ -17,7 +17,7 @@ logger = logging.getLogger('QUIZ_bot TG')
 
 
 QUESTIONS = []
-QUESTION, ANSWER, RESULT, REDIS = range(4)
+QUESTION, ANSWER, RESULT = range(3)
 
 
 def get_keyboard() -> ReplyKeyboardMarkup:
@@ -28,6 +28,7 @@ def get_keyboard() -> ReplyKeyboardMarkup:
 
 def start(update: Update, context: CallbackContext):
     logger.info("Получена команда start")
+    context.user_data['redis_connection'] = redis.Redis(host=os.getenv('REDIS_HOST'), port=os.getenv('REDIS_PORT'))
     update.message.reply_text(
         'Привет! Я квиз-БОТ, помогу тебе проверить уровень твоих знаний. '
         'Если хочешь закончить диалог - введи команду /exit',
@@ -42,14 +43,14 @@ def handle_new_question_request(update: Update, context: CallbackContext):
     logger.info(f'Пользователь {context.user_data["user_id"]} - Запрошен новый вопрос')
     question = random.choice(QUESTIONS)
     update.message.reply_text(text=question['question'], reply_markup=get_keyboard())
-    REDIS.set(context.user_data['user_id'], question['answer'])
+    context.user_data['redis_connection'].set(context.user_data['user_id'], question['answer'])
     return ANSWER
 
 
 def handle_solution_attempt(update: Update, context: CallbackContext):
     logger.info(f'Пользователь {context.user_data["user_id"]} - Ожидание ответа')
     user_answer = update.message.text
-    correct_answer = REDIS.get(context.user_data['user_id']).decode()
+    correct_answer = context.user_data['redis_connection'].get(context.user_data['user_id']).decode()
     if user_answer.lower() in correct_answer.lower() and len(user_answer) > 1:
         logger.info(f'Пользователь {context.user_data["user_id"]} - Получен верный ответ')
         update.message.reply_text(text='Правильно! Поздравляю! Для следующего вопроса нажми "Новый вопрос"',
@@ -84,9 +85,6 @@ if __name__ == '__main__':
 
     updater = Updater(os.getenv('TELEGRAM_BOT_TOKEN'))
     dp = updater.dispatcher
-
-    REDIS = redis.Redis(host=os.getenv('REDIS_HOST'), port=os.getenv('REDIS_PORT'))
-    questions = get_questions()
 
     QUESTIONS = get_questions()
 

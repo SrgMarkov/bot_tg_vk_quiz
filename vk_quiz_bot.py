@@ -30,7 +30,7 @@ def get_vk_keyboard():
 if __name__ == "__main__":
     load_dotenv()
     vk_session = vk.VkApi(token=os.getenv('VK_TOKEN'))
-    redis = redis.Redis(host=os.getenv('REDIS_HOST'), port=os.getenv('REDIS_PORT'))
+    redis_db = redis.Redis(host=os.getenv('REDIS_HOST'), port=os.getenv('REDIS_PORT'))
     questions = get_questions()
     user_results = 0
 
@@ -40,7 +40,7 @@ if __name__ == "__main__":
             if event.text == 'Новый вопрос':
                 logger.info(f'Пользователь {user_id} - Запрошен новый вопрос')
                 question = random.choice(questions)
-                redis.set(user_id, question['answer'])
+                redis_db.set(user_id, question['answer'])
                 vk_session.method('messages.send', {
                     'user_id': user_id,
                     'message': question['question'],

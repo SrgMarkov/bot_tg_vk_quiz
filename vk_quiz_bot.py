@@ -41,7 +41,6 @@ if __name__ == "__main__":
                 logger.info(f'Пользователь {user_id} - Запрошен новый вопрос')
                 question = random.choice(questions)
                 redis.set(user_id, question['answer'])
-                print(question)
                 vk_session.method('messages.send', {
                     'user_id': user_id,
                     'message': question['question'],

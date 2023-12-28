@@ -1,14 +1,11 @@
 import os
 
-from dotenv import load_dotenv
-
 
 def format_text(text: str) -> str:
     return text.replace('\n', ' ').split(':')[1]
 
 
 def get_questions():
-    load_dotenv()
     questions_folder = os.getenv('QUESTIONS_FOLDER')
     questions_files = [os.path.join(questions_folder, file) for file in os.listdir(questions_folder)]
     questions_for_bot = []

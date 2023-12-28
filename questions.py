@@ -16,16 +16,17 @@ def get_questions():
     for questions_file in questions_files:
         with open(questions_file, 'r', encoding="KOI8-R") as text_file:
             encoded_text_file = text_file.read()
-            questions = encoded_text_file.split('\n\n')
-            for question in questions:
-                if ('Вопрос' in question) \
-                        and ('aud' not in question) \
-                        and ('pic' not in question) \
-                        and ('Ведущему' not in question):
-                    item_index = questions.index(question)
-                    try:
-                        questions_for_bot.append({'question': format_text(question),
-                                                  'answer': format_text(questions[item_index + 1])})
-                    except IndexError:
-                        pass
+        questions = encoded_text_file.split('\n\n')
+        for question in questions:
+            if ('Вопрос' in question) \
+                    and ('aud' not in question) \
+                    and ('pic' not in question) \
+                    and ('Ведущему' not in question):
+                item_index = questions.index(question)
+                try:
+                    questions_for_bot.append({'question': format_text(question),
+                                              'answer': format_text(questions[item_index + 1])})
+                except IndexError:
+                    pass
+    print(questions_for_bot)
     return questions_for_bot

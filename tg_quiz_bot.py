@@ -10,11 +10,7 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Conve
 from questions import get_questions
 
 
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO)
-
 logger = logging.getLogger('QUIZ_bot TG')
-
 
 QUESTIONS = []
 QUESTION, ANSWER, RESULT = range(3)
@@ -85,6 +81,9 @@ if __name__ == '__main__':
 
     updater = Updater(os.getenv('TELEGRAM_BOT_TOKEN'))
     dp = updater.dispatcher
+    logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                        level=logging.INFO)
+    logger.setLevel(logging.INFO)
 
     QUESTIONS = get_questions()
 

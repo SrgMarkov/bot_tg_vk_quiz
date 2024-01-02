@@ -3,3 +3,4 @@
 .env
 quiz-questions/
 /__pycache__/
+.DS_Store

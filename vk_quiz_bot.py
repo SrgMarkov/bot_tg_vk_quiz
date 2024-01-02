@@ -12,9 +12,6 @@ from vk_api.utils import get_random_id
 from questions import get_questions
 
 
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO)
-
 logger = logging.getLogger('QUIZ_bot VK')
 
 
@@ -31,6 +28,11 @@ if __name__ == "__main__":
     load_dotenv()
     vk_session = vk.VkApi(token=os.getenv('VK_TOKEN'))
     redis_db = redis.Redis(host=os.getenv('REDIS_HOST'), port=os.getenv('REDIS_PORT'))
+
+    logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                        level=logging.INFO)
+    logger.setLevel(logging.INFO)
+
     questions = get_questions()
     user_results = 0
 

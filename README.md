@@ -28,17 +28,17 @@ REDIS_HOST - адрес сервера Redis
 REDIS_PORT - порт cthdthf Redis
 ```
 Установить зависимости командой
-```bash
+```sh
 pip install -r requirements.txt
 ```
 ### Как запустить
 Перед запуском необходимо убедиться что текстовые файлы с вопросам лежат по указанному в `env` пути
 
 Запустить скрипты командами:
-```bash
+```sh
 python3 tg_quiz_bot.py
 ```
-```bash
+```sh
 python3 vk_quiz_bot.py
 ```
 

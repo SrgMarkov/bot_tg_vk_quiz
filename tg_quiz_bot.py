@@ -12,7 +12,6 @@ from questions import get_questions
 
 logger = logging.getLogger('QUIZ_bot TG')
 
-QUESTIONS = []
 QUESTION, ANSWER, RESULT = range(3)
 
 
@@ -25,6 +24,7 @@ def get_keyboard() -> ReplyKeyboardMarkup:
 def start(update: Update, context: CallbackContext):
     logger.info("Получена команда start")
     context.user_data['redis_connection'] = redis.Redis(host=os.getenv('REDIS_HOST'), port=os.getenv('REDIS_PORT'))
+    context.user_data['questions'] = get_questions()
     update.message.reply_text(
         'Привет! Я квиз-БОТ, помогу тебе проверить уровень твоих знаний. '
         'Если хочешь закончить диалог - введи команду /exit',
@@ -37,7 +37,7 @@ def start(update: Update, context: CallbackContext):
 def handle_new_question_request(update: Update, context: CallbackContext):
     context.user_data['user_id'] = update.message.from_user.id
     logger.info(f'Пользователь {context.user_data["user_id"]} - Запрошен новый вопрос')
-    question = random.choice(QUESTIONS)
+    question = random.choice(context.user_data['questions'])
     update.message.reply_text(text=question['question'], reply_markup=get_keyboard())
     context.user_data['redis_connection'].set(context.user_data['user_id'], question['answer'])
     return ANSWER
@@ -84,8 +84,6 @@ if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                         level=logging.INFO)
     logger.setLevel(logging.INFO)
-
-    QUESTIONS = get_questions()
 
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start)],

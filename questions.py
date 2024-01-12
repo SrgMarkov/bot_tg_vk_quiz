@@ -25,5 +25,4 @@ def get_questions():
                                               'answer': format_text(questions[item_index + 1])})
                 except IndexError:
                     pass
-    print(questions_for_bot)
     return questions_for_bot

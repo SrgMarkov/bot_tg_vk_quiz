@@ -33,7 +33,7 @@ def reply_from_vk_bot(user_id, message):
 def get_answer_from_user(event, user_id, redis_db):
     if event.text.lower() in redis_db.get(user_id).decode().lower() and len(event.text) > 1:
         logger.info(f'Пользователь {user_id} - Получен верный ответ')
-        user_result = redis_db.get(f'{user_id}_result') + 1
+        user_result = int(redis_db.get(f'{user_id}_result').decode()) + 1
         redis_db.set(f'{user_id}_result', user_result)
         reply_from_vk_bot(user_id, 'Правильно! Поздравляю! Для следующего вопроса нажми "Новый вопрос"')
     else:
@@ -52,24 +52,27 @@ if __name__ == "__main__":
     questions = get_questions()
 
     for event in VkLongPoll(vk_session).listen():
-        if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-            user_id = event.user_id
-            if redis_db.get(f'{user_id}_result') is None:
-                redis_db.set(f'{user_id}_result', 0)
-            if event.text == 'Новый вопрос':
-                logger.info(f'Пользователь {user_id} - Запрошен новый вопрос')
-                question = random.choice(questions)
-                redis_db.set(user_id, question['answer'])
-                reply_from_vk_bot(user_id, question['question'])
-            elif event.text == 'Сдаться':
-                logger.info(f'Пользователь {user_id} - Сдался')
-                message = f'Вот тебе правильный ответ - {redis_db.get(user_id).decode()} Чтобы продолжить - нажми ' \
-                          f'"Новый вопрос"'
-                reply_from_vk_bot(user_id, message)
-            elif event.text == 'Мой счёт':
-                logger.info(f'Пользователь {user_id} - запрошен счет')
-                message = f'Количество правильных ответов - {redis_db.get(f"{user_id}_result").decode()}'
-                reply_from_vk_bot(user_id, message)
-            else:
-                get_answer_from_user(event, user_id, redis_db)
+        if not (event.type == VkEventType.MESSAGE_NEW and event.to_me):
+            continue
+        user_id = event.user_id
+        if redis_db.get(f'{user_id}_result') is None:
+            redis_db.set(f'{user_id}_result', 0)
+        if event.text == 'Новый вопрос':
+            logger.info(f'Пользователь {user_id} - Запрошен новый вопрос')
+            question = random.choice(questions)
+            redis_db.set(user_id, question['answer'])
+            reply_from_vk_bot(user_id, question['question'])
+            continue
+        if event.text == 'Сдаться':
+            logger.info(f'Пользователь {user_id} - Сдался')
+            message = f'Вот тебе правильный ответ - {redis_db.get(user_id).decode()} Чтобы продолжить - нажми ' \
+                      f'"Новый вопрос"'
+            reply_from_vk_bot(user_id, message)
+            continue
+        if event.text == 'Мой счёт':
+            logger.info(f'Пользователь {user_id} - запрошен счет')
+            message = f'Количество правильных ответов - {redis_db.get(f"{user_id}_result").decode()}'
+            reply_from_vk_bot(user_id, message)
+            continue
+        get_answer_from_user(event, user_id, redis_db)
 

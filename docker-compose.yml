@@ -1,0 +1,32 @@
+version: '3.6'
+services:
+  python-bot:
+    build: .
+    container_name: quizbot
+    volumes:
+      - /{REPLACE_ME}:/opt/app/questions
+    environment:
+      - 'TELEGRAM_BOT_TOKEN={REPLACE_ME}'
+      - 'VK_TOKEN={REPLACE_ME}'
+      - 'QUESTIONS_FOLDER=/opt/app/questions/'
+      - REDIS_HOST=redis
+      - 'REDIS_PORT=6379'
+    depends_on:
+      - redis
+    networks:
+      - internet
+      - redis-net
+  redis:
+    image: redis
+    container_name: redis
+    environment:
+      - REDIS_PORT=6379
+    networks:
+      - redis-net
+networks:
+  internet:
+    name: internet
+    driver: bridge
+  redis-net:
+    name: redis-net
+    driver: bridge
